@@ -1,7 +1,9 @@
 import { products } from "../core/data";
-import { productCard, productList, starUi } from "../core/selectors";
+import { cartBody, cartBox, cartBtn, productCard, productList, starUi } from "../core/selectors";
+import { addToCart } from "./cart";
 
 export const productRender = (productArr) => {
+  productList.innerText = "";
   productArr.forEach((el) => productList.append(createProduct(el)));
 };
 
@@ -26,7 +28,7 @@ starDiv.classList.add("flex","gap-1");
 for (let i = 1; i <= 5; i++) {
     const clone = starUi.content.cloneNode(true);
     const cloneUi = clone.querySelector(".star");
-    i <= rate.toFixed(0) && cloneUi.classList.add("fill-yellow-500");
+    i <= rate.toFixed(0) && cloneUi.classList.add("fill-orange-500");
     starDiv.append(cloneUi);
 }
     return starDiv;
@@ -46,6 +48,7 @@ export const createProduct = ({id, title, description, image, price, rating:{rat
   const productCardPrice = productCardUi.querySelector(
     ".product-card-price .price"
   );
+  const addToCartBtn = productCardUi.querySelector(".add-to-cart");
 
   productCardUi.setAttribute("product-id",id)
   productCardTitle.innerText = title;
@@ -54,6 +57,13 @@ export const createProduct = ({id, title, description, image, price, rating:{rat
   productCardPrice.innerText = price;
   productCardRating.innerText = `( ${rate}/ ${count})`;
   productCardRatingStars.append(stars(rate));
+
+  const isExistedInCart = cartBody.querySelector(`[cart-product-id="${id}"]`);
+  if(isExistedInCart){
+    addToCartBtn.classList.add("bg-neutral-600","text-white");
+    addToCartBtn.innerText = "Added";
+    addToCartBtn.disabled = true;
+  }
 
 
   return productCardUi;
@@ -65,7 +75,63 @@ export const productListHandler = (event) => {
         const currentProductCard = event.target.closest(".product-card");
         const currentProductId = currentProductCard.getAttribute("product-id");
         const currentProduct = products.find(el => el.id == currentProductId)
-        console.log(currentProductCard);
-        console.log(currentProduct);
+        // console.log(currentProductCard);
+        // console.log(currentProduct);
+
+        const currentAddToCartBtn = currentProductCard.querySelector(".add-to-cart");
+
+        currentAddToCartBtn.classList.add("bg-neutral-600","text-white");
+        currentAddToCartBtn.innerText = "Added";
+        currentAddToCartBtn.disabled = true;
+
+
+        const currentProductImg = currentProductCard.querySelector(".product-card-img");
+        const currentImgPosition = currentProductImg.getBoundingClientRect();
+        const cartBtnPosition = cartBtn.getBoundingClientRect(); 
+
+        const img = new Image();
+        img.src = currentProductImg.src;
+        img.classList.add("fixed","h-32","z-50");
+        img.style.top = currentImgPosition.top + "px";
+        img.style.left = currentImgPosition.left + "px";
+        let keyframe;
+
+        if(cartBox.classList.contains("translate-x-full")){
+           keyframe = [ 
+            {top: currentImgPosition.top + "px", left: currentImgPosition.left + "px"},
+            {top: cartBtnPosition.top+10 + "px", left: cartBtnPosition.left+10 + "px", height: "10px", rotate: "2turn "}
+          ]
+        }else{
+
+          const lastCartPosition = document.querySelector(".cart-item:last-child")?.getBoundingClientRect();
+
+          const aniLeft = lastCartPosition ? lastCartPosition.left+10 : cartBody.getBoundingClientRect().left;
+          const aniTop  = lastCartPosition ? lastCartPosition.bottom+10 : cartBody.getBoundingClientRect().top;
+
+           keyframe = [ 
+            {top: currentImgPosition.top + "px", left: currentImgPosition.left + "px"},
+            {top: aniTop + "px", left: aniLeft + "px", height: "10px", rotate: "2turn "}
+          ]
+        }
+
+        const options = {
+          duration: 500,
+          iterations: 1,
+          fill: "both",
+        }
+
+        const imgAnimation = img.animate(keyframe,options);
+
+        imgAnimation.addEventListener("finish",() => {
+          addToCart(currentProductId);
+          img.remove();
+          cartBtn.classList.add("animate__tada");
+          cartBtn.addEventListener("animationend",() => {
+            cartBtn.classList.remove("animate__tada")
+          })
+        })
+
+
+        app.append(img);
     }
 }

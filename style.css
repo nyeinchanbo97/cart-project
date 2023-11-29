@@ -1,3 +1,7 @@
+@import url("./node_modules/sweetalert2/dist/sweetalert2.min.css");
+
+@import url("./node_modules/animate.css/animate.min.css");
+
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&family=Padauk:wght@400;700&family=Rubik:wght@300;400&display=swap');
 @tailwind base;
 @tailwind components;
@@ -10,3 +14,15 @@
 .category-btn.active{
     @apply bg-neutral-600 text-white
 }
+
+.swal2-popup {
+    @apply border-0 rounded-none !important;
+  }
+  
+  .swal2-confirm {
+    @apply border-0 rounded-none bg-neutral-600 !important;
+  }
+  
+  .swal2-cancel {
+    @apply border-0 rounded-none bg-neutral-300 text-neutral-600 !important;
+  }

@@ -1,8 +1,8 @@
 export const categories = [
-    "Electronic",
-    "Jewelry",
-    "Men's Clothing",
-    "Women's Clothing"
+    "electronics",
+    "jewelry",
+    "men's clothing",
+    "women's clothing"
 ]
 
 
